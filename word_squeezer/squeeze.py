@@ -75,7 +75,7 @@ class WordSqueezer:
             # if there are no matches with the current prefix we can avoid exhaustive brute-force permutations.
             if node.is_prefix:
                 yield from self._permute_and_check(
-                    letters[:i] + letters[i + 1:], prefix=new_word
+                    letters[:i] + letters[i + 1 :], prefix=new_word
                 )
 
 
@@ -86,10 +86,10 @@ def main(source_word: str, wordlist: t.List[str], target_word_length: int = None
     if target_word_length:
         wordlist = filter(lambda x: len(x) >= target_word_length, wordlist)
 
-    tr = Trie(wordlist)
-    sq = WordSqueezer(tr)
+    trie = Trie(list(wordlist))
+    ws = WordSqueezer(trie)
 
-    squeezed_words = sq.squeeze(source_word)
+    squeezed_words = ws.squeeze(source_word)
 
     for word in squeezed_words:
         print(word)
