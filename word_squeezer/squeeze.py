@@ -75,8 +75,73 @@ class WordSqueezer:
             # if there are no matches with the current prefix we can avoid exhaustive brute-force permutations.
             if node.is_prefix:
                 yield from self._permute_and_check(
-                    letters[:i] + letters[i + 1 :], prefix=new_word
+                    letters[:i] + letters[i + 1:], prefix=new_word
                 )
+
+
+class WordamentSqueezer:
+    """Microsoft Wordament solver"""
+
+    def __init__(self, trie: Trie):
+        self.trie = trie
+
+    def squeeze(self, word_grid: t.List[t.List[str]]) -> t.List[str]:
+        return list(self._squeeze_raw(word_grid))
+
+    def _squeeze_raw(self, word_grid: t.List[t.List[str]]) -> t.Iterable[str]:
+        """squeeze_raw may return duplicate words"""
+        path = [(0, 0)]
+        yield from self._traverse_grid(word_grid, path)
+
+        path = [(1, 0)]
+        yield from self._traverse_grid(word_grid, path)
+
+    # 1. pick next position [how, shall we use the same clockwise method?]
+    # 2. look around clockwise
+    # 3. if new position is not in the path, add the slot to the path
+    # 4. if the path is a word in trie, yield it
+    # 5. if the path is a prefix in trie, repeat the loop to loop from 1
+    def _traverse_grid(
+            self, word_grid: t.List[t.List[str]], path: t.List[t.Tuple[int, int]] = None
+    ):
+        path_head = path[-1]
+        for new_head in self.walk_around(path_head[0], path_head[1]):
+            # check if new_head is in the grid bounds
+            if not self._is_position_in_grid(word_grid, new_head):
+                continue
+            # check if new_head is not already in the path
+            if new_head in path:
+                continue
+
+            new_path = path + [new_head]
+            path_string = self._get_path_string(word_grid, new_path)
+
+            node = self.trie.get_node(path_string)
+            if node.is_word:
+                yield path_string
+
+            if node.is_prefix:
+                yield from self._traverse_grid(word_grid, new_path)
+
+    @staticmethod
+    def walk_around(i: int, j: int) -> t.List[t.Tuple[int, int]]:
+        # return surrounding 2-D positions of a slot (i, j)
+        # x  x  x
+        # x i,j x
+        # x  x  x
+        deltas = [(0, 1), (1, 0), (0, -1), (-1, 0), (1, -1), (-1, 1), (1, 1), (-1, -1)]
+        return [(i + delta_i, j + delta_j) for (delta_i, delta_j) in deltas]
+
+    def _is_position_in_grid(self, word_grid: t.List[t.List[str]], position: t.Tuple[int, int]) -> bool:
+        i, j = position
+        i_max = len(word_grid)
+        j_max = len(word_grid[0])
+        return 0 <= i < i_max and 0 <= j < j_max
+
+    def _get_path_string(
+            self, word_grid: t.List[t.List[str]], path: t.List[t.Tuple[int, int]]
+    ) -> str:
+        return "".join(word_grid[i][j] for (i, j) in path)
 
 
 def main(source_word: str, wordlist: t.List[str], target_word_length: int = None):
