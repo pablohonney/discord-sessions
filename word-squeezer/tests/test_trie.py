@@ -1,6 +1,4 @@
-from ..squeeze import (
-    Trie,
-)
+from word_squeezer.trie import Trie
 
 
 def test_get_node_in_trie():

@@ -1,53 +1,9 @@
 import typing as t
-from dataclasses import dataclass, field
 from pathlib import Path
 import argparse
 
-
-def read_system_vocab(word_list_path: Path) -> t.List[str]:
-    return open(word_list_path).read().split("\n")
-
-
-class Trie:
-    """Prefix tree object for efficient word lookup, avoiding exhaustive brute-force character permutations"""
-
-    @dataclass
-    class Node:
-        is_word: bool = False
-        subtrie: dict = field(default_factory=dict)
-
-        @property
-        def is_prefix(self) -> bool:
-            return bool(self.subtrie)
-
-    # avoid edge-case checks by using a sentinel node
-    _sentinel_node = Node()
-
-    def __init__(self, words: t.List[str]):
-        self._root = self.Node()
-
-        for word in words:
-            self.add(word)
-
-    def add(self, word: str) -> None:
-        node = self._root
-        for letter in word:
-            node = node.subtrie.setdefault(letter, self.Node())
-        node.is_word = True
-
-    def __contains__(self, word: str) -> bool:
-        return self.get_node(word).is_word
-
-    def is_prefix(self, word: str) -> bool:
-        return self.get_node(word).is_prefix
-
-    def get_node(self, word: str) -> Node:
-        node = self._root
-        for letter in word:
-            if letter not in node.subtrie:
-                return self._sentinel_node
-            node = node.subtrie[letter]
-        return node
+from .trie import Trie
+from .utils import read_wordlist
 
 
 class WordSqueezer:
@@ -79,7 +35,9 @@ class WordSqueezer:
                 )
 
 
-def main(source_word: str, wordlist: t.List[str], target_word_length: int = None):
+def solve_word_squeezer(
+    source_word: str, wordlist: t.List[str], target_word_length: int = None
+):
     # exclude the source word itself
     wordlist = filter(lambda x: x != source_word, wordlist)
 
@@ -95,7 +53,7 @@ def main(source_word: str, wordlist: t.List[str], target_word_length: int = None
         print(word)
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         "Word squeezer finds words from the source word's characters"
     )
@@ -112,8 +70,12 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    main(
+    solve_word_squeezer(
         args.source_word,
-        read_system_vocab(args.word_list_file),
+        read_wordlist(args.word_list_file),
         args.minimum_word_length,
     )
+
+
+if __name__ == "__main__":
+    main()
