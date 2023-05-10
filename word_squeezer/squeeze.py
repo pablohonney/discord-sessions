@@ -90,11 +90,8 @@ class WordamentSqueezer:
 
     def _squeeze_raw(self, word_grid: t.List[t.List[str]]) -> t.Iterable[str]:
         """squeeze_raw may return duplicate words"""
-        path = [(0, 0)]
-        yield from self._traverse_grid(word_grid, path)
-
-        path = [(1, 0)]
-        yield from self._traverse_grid(word_grid, path)
+        for start_head in self._get_start_heads(word_grid):
+            yield from self._traverse_grid(word_grid, [start_head])
 
     # 1. pick next position [how, shall we use the same clockwise method?]
     # 2. look around clockwise
@@ -142,6 +139,14 @@ class WordamentSqueezer:
             self, word_grid: t.List[t.List[str]], path: t.List[t.Tuple[int, int]]
     ) -> str:
         return "".join(word_grid[i][j] for (i, j) in path)
+
+    def _get_start_heads(self, word_grid: t.List[t.List[str]]) -> t.List[t.Tuple[int, int]]:
+        i_max = len(word_grid)
+        j_max = len(word_grid[0])
+
+        for i in range(i_max):
+            for j in range(j_max):
+                yield i, j
 
 
 def main(source_word: str, wordlist: t.List[str], target_word_length: int = None):
