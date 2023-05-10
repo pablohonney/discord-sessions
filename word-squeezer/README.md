@@ -22,3 +22,5 @@ example:
     l e e l
 
 On a Mac system the command would be `wordament -f /usr/share/dict/words -l 3 'l r t l|f a a n|g c s t|l e e l'`
+
+TODO: Wordament slots can contain alternating letters. This feature is not supported yet. e.g. `wordament -f /usr/share/dict/words -l 3 'l r/d t l|f a a n|g c s t|l e e l'`
