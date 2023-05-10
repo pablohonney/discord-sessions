@@ -1,7 +1,5 @@
-from ..squeeze import (
-    Trie,
-    WordSqueezer,
-)
+from word_squeezer.trie import Trie
+from word_squeezer.word_squeezer import WordSqueezer
 
 
 def test_word_squeezer():
