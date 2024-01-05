@@ -60,8 +60,6 @@ def find_char_class(regex: str) -> tuple[str, str]:
 
 
 def parse_regex(regex: str) -> dict:
-
-
     if len(regex) == 0:
         return lit("")
 

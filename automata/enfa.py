@@ -45,3 +45,25 @@ if __name__ == "__main__":
     nfa = EpsilonNFA(nfa_tuple)
 
     assert nfa.accept("00101") is True
+
+    nfa_tuple = NFATuple(
+        Q={"q0", "q1", "q2"},
+        S={EPSILON},
+        T={
+            "q0": {
+                EPSILON: {"q1"},
+            },
+            "q1": {
+                EPSILON: {"q2"}
+            },
+            "q2": {
+                EPSILON: {"q3"}
+            }
+        },
+        q0="q0",
+        F={"q3"}
+    )
+
+    nfa = EpsilonNFA(nfa_tuple)
+
+    assert nfa.accept("") is True
